@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
@@ -97,6 +97,29 @@ const movies = {
   },
 };
 
+class NoLikedMovies extends PureComponent {
+	render() {
+    	return (
+        	<p>None of the current users liked this movie</p>
+        );
+    }
+}
+
+class LikedMovies extends Component {
+	render() {
+    	return (
+          <div>
+          <p>Liked By:</p>
+        	<ul>
+          		{this.props.usersLikedMovie.map(user =>
+          			<li key={user.id}>{user.name}</li>
+				)}
+          	</ul>
+</div>
+        );
+    }
+}
+
 class App extends Component {
   render() {
     return (
@@ -106,6 +129,18 @@ class App extends Component {
           <h1 className="App-title">ReactND - Coding Practice</h1>
         </header>
         <h2>How Popular is Your Favorite Movie?</h2>
+		<hr/>
+		{Object.values(movies).map(movie => {
+          const userIDs = profiles
+          					.filter(profile => profile.favoriteMovieID === movie.id.toString())
+          					.map(filtered => filtered.userID);
+          const usersLikedMovie = Object.values(users)
+          						.filter(user => userIDs.includes(user.id.toString()));
+          return (<div>
+			<h2>{movie.name}</h2>
+            {usersLikedMovie.length ? <LikedMovies usersLikedMovie={usersLikedMovie}/> : <NoLikedMovies/> }
+          </div>
+        )})}
       </div>
     );
   }
