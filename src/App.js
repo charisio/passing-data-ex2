@@ -1,4 +1,4 @@
-import React, { Component, PureComponent } from 'react';
+import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
@@ -97,27 +97,46 @@ const movies = {
   },
 };
 
-class NoLikedMovies extends PureComponent {
+const NotLikedMovies = () => (
+	<p>None of the current users liked this movie</p>
+);
+
+class LikedMovies extends Component {
 	render() {
+      const {usersLikedMovie} = this.props;
     	return (
-        	<p>None of the current users liked this movie</p>
+			<div>
+              <p>Liked By:</p>
+              <ul>
+                  {usersLikedMovie.map(user =>
+                      <li key={user.name}>{user.name}</li>
+                  )}
+              </ul>
+			</div>
         );
     }
 }
 
-class LikedMovies extends Component {
-	render() {
-    	return (
-          <div>
-          <p>Liked By:</p>
-        	<ul>
-          		{this.props.usersLikedMovie.map(user =>
-          			<li key={user.id}>{user.name}</li>
-				)}
-          	</ul>
-</div>
-        );
-    }
+class MoviesList extends Component {
+  render() {
+    const {movies} = this.props;
+    const usersWhoLikedMovies = Object.values(movies).map(movie => {
+          const userIDs = profiles.filter(profile => profile.favoriteMovieID === movie.id.toString()).map(filtered => filtered.userID);
+          const usersLikedMovie = Object.values(users).filter(user => userIDs.includes(user.id.toString()));
+          return (
+            <li key={movie.name}>
+              <h2>{movie.name}</h2>
+              {usersLikedMovie.length ? 
+                    <LikedMovies usersLikedMovie={usersLikedMovie}/> : 
+                    <NotLikedMovies/> }
+          	</li>
+        )});
+  	return(
+      <ul>
+      	{usersWhoLikedMovies}
+      </ul>
+    );
+  }
 }
 
 class App extends Component {
@@ -129,18 +148,10 @@ class App extends Component {
           <h1 className="App-title">ReactND - Coding Practice</h1>
         </header>
         <h2>How Popular is Your Favorite Movie?</h2>
-		<hr/>
-		{Object.values(movies).map(movie => {
-          const userIDs = profiles
-          					.filter(profile => profile.favoriteMovieID === movie.id.toString())
-          					.map(filtered => filtered.userID);
-          const usersLikedMovie = Object.values(users)
-          						.filter(user => userIDs.includes(user.id.toString()));
-          return (<div>
-			<h2>{movie.name}</h2>
-            {usersLikedMovie.length ? <LikedMovies usersLikedMovie={usersLikedMovie}/> : <NoLikedMovies/> }
-          </div>
-        )})}
+		<MoviesList 
+			movies={movies} 
+			users={users} 
+			profiles={profiles} />
       </div>
     );
   }
